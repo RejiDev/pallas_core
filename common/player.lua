@@ -1,0 +1,31 @@
+-- Player wrapper — extends Unit with player-specific functionality.
+-- Inherits all Unit methods and adds player-only functions.
+-- Unit is loaded as a global by the plugin.
+
+local Player = {}
+Player.__index = Player
+setmetatable(Player, { __index = Unit })
+
+function Player:New(entity)
+  local unit = Unit:New(entity)
+  if not unit then
+    return nil
+  end
+
+  -- Set the metatable to Player so player-specific methods are available
+  setmetatable(unit, Player)
+
+  return unit
+end
+
+-- Check if the player is currently auto-attacking
+-- Spell ID 6603 is "Auto Attack" in WoW
+function Player:IsAutoAttacking()
+  return game.is_current_spell(6603)
+end
+
+function Player:StopCasting()
+  game.stop_casting()
+end
+
+return Player

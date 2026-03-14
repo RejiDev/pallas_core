@@ -93,8 +93,12 @@ local function load_modules()
   include("common/targeting.lua")
 
   local UnitMod = include("common/unit.lua")
+  local PlayerMod = include("common/player.lua")
   if UnitMod then
     Unit = UnitMod
+  end
+  if PlayerMod then
+    Player = PlayerMod
   end
 
   include("common/spell.lua")
@@ -118,7 +122,7 @@ local function refresh_me()
     return
   end
 
-  Me = Unit:New(player)
+  Me = Player:New(player)
   if not Me then return end
 
   -- Attach class metadata
@@ -240,9 +244,6 @@ function Plugin.onTick()
   if Spell.CacheCount == 0 then
     Spell:UpdateCache()
   end
-
-  -- Casting guard: skip behavior dispatch while casting/channeling
-  if Me.IsCasting or Me.IsChanneling then return end
 
   -- Run the targeting pipelines
   Combat:Update()
