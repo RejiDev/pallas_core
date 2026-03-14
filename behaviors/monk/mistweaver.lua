@@ -7,11 +7,17 @@ local options = {
 local auras = {tiger_palm = 125359}
 
 local function DoCombat()
+
     local target = Combat.BestTarget
     if not target then return end
+
+    print(game.is_spell_in_range(6603, target.obj_ptr))
+
     if not Me:InMeleeRange(target) then return end
 
-    Spell.AutoAttack:CastEx(target)
+    if not Me:IsAutoAttacking() and Spell.AutoAttack:CastEx(target) then
+        return
+    end
 
     if Spell:IsGCDActive() then return end
     if not Me:HasAura(auras.tiger_palm) and Spell.TigerPalm:CastEx(target) then
@@ -23,16 +29,21 @@ local function DoCombat()
     if Spell.TigerPalm:CastEx(target) then return end
 end
 
--- Heal logic (optional) — called every tick while the heal system runs.
--- local function DoHeal()
---   local lowest = Heal:GetLowestMember()
---   if not lowest then return end
---   -- if lowest.HealthPct < 60 and Spell.FlashHeal:CastEx(lowest) then return end
--- end
+local function DoHeal()
+    local lowest = Heal:GetLowestMember()
+    if not lowest then return end
+
+    if lowest.HealthPct < 90 and Spell.SoothingMist:CastEx(lowest) then
+        return
+    end
+
+    if not lowest or lowest.HealthPct > 98 then game.stop_casting() end
+
+end
 
 local behaviors = {
+    [BehaviorType.Heal] = DoHeal,
     [BehaviorType.Combat] = DoCombat
-    -- [BehaviorType.Heal] = DoHeal,
     -- [BehaviorType.Tank] = DoTank,
 }
 

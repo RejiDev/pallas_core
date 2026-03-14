@@ -124,12 +124,6 @@ function SpellWrapper:CastEx(target)
     -- Range check: skip if target is out of spell range
     if target and target ~= Me and not self:InRange(target) then return false end
 
-    -- Facing check: most spells require a 180° frontal cone
-    if target and target ~= Me and Me and Me.obj_ptr and target.obj_ptr then
-        local fok, facing = pcall(game.is_facing, Me.obj_ptr, target.obj_ptr)
-        if fok and not facing then return false end
-    end
-
     local code, desc = self:Cast(target)
 
     if code == RESULT_SUCCESS or code == RESULT_QUEUED then
