@@ -33,6 +33,7 @@ function Combat:CollectTargets()
     if tgt and tgt:validTarget() then
       self.Targets[#self.Targets + 1] = tgt
     end
+
     return
   end
 
@@ -51,8 +52,14 @@ function Combat:CollectTargets()
     if not eu then goto skip end
     if eu.is_dead then goto skip end
     if eu.health and eu.health <= 0 then goto skip end
-    if not eu.in_combat and not PallasSettings.PallasAttackOOC then goto skip end
-    if not Me:CanAttack(eu) then goto skip end
+    if not eu.in_combat then
+      -- Only allow out-of-combat units if they are the current target and AttackOOC is enabled
+      local is_current_target = Me.Target and Me.Target.Guid == eu.guid
+      if not (PallasSettings.PallasAttackOOC and is_current_target) then
+        goto skip
+      end
+    end
+    if not game.unit_can_attack(e.obj_ptr) then goto skip end
 
     -- Cheap squared-distance check (40yd = 1600 sq)
     if mx and e.position then
@@ -63,6 +70,7 @@ function Combat:CollectTargets()
     end
 
     self.Targets[#self.Targets + 1] = Unit:New(e)
+
     ::skip::
   end
 end
@@ -72,18 +80,20 @@ end
 local LOS_FLAGS = 0x03
 
 function Combat:ExclusionFilter()
-  local require_threat = not PallasSettings.PallasAttackOOC
   local my_tgt_guid = Me.Target and Me.Target.Guid or ""
   local keep = {}
   for _, u in ipairs(self.Targets) do
     if not u or not u:validTarget() then goto skip_ex end
 
-    -- Threat gate: filter mobs that are in combat with something else, not us.
-    -- Exempt the player's current target when "Always attack current target" is on.
-    local is_my_target = u.Guid == my_tgt_guid
-    if require_threat and not (is_my_target and PallasSettings.PallasAttackTarget) then
-      local tok, tanking = pcall(game.unit_threat, u.obj_ptr)
-      if not tok or tanking == nil then goto skip_ex end
+    -- Check if unit is attackable, dead, or out of range
+    if not u:IsAttackable() then goto skip_ex end
+    if u:DeadOrGhost() or u.Health <= 1 then goto skip_ex end
+    if Me:GetDistance(u) >= 40 then goto skip_ex end
+
+    -- Exempt current target when AttackOOC is enabled
+    if u.Guid == my_tgt_guid and PallasSettings.PallasAttackOOC then
+      keep[#keep + 1] = u
+      goto skip_ex
     end
 
     -- Geometry-only LOS: terrain + buildings, no model collision
@@ -100,6 +110,9 @@ end
 
 function Combat:InclusionFilter()
   if not PallasSettings.PallasAttackTarget then return end
+
+  -- Don't add targets when out of combat with AttackOOC enabled
+  if not Me.InCombat and PallasSettings.PallasAttackOOC then return end
 
   local tgt = Me.Target
   if not tgt then return end
