@@ -396,6 +396,32 @@ function Unit:validTarget()
   return true
 end
 
+-- Check if a unit is in combat with any party member (excluding the player)
+function Unit:isUnitInCombatWithParty(unit)
+  if not unit or not unit.InCombat then
+    return false
+  end
+  
+  local target = unit:GetTarget()
+  if not target then
+    return false
+  end
+  
+  -- Check if unit's target is any party member (excluding player)
+  local party = Party and Party.currentParty
+  if not party or not party.members then
+    return false
+  end
+  
+  for _, member in ipairs(party.members) do
+    if member and member.guid and not member.guid.equals(Me.guid) and member.guid.equals(target.Guid) then
+      return true
+    end
+  end
+  
+  return false
+end
+
 -- Alias used by Pallas-style code: unit.Target (property, not method).
 -- Set by the refresh loop on Me only.
 Unit.Target = nil

@@ -96,6 +96,17 @@ function Combat:ExclusionFilter()
       goto skip_ex
     end
 
+    -- Check if unit is in combat with player or party
+    if not u.InCombat and not u:isUnitInCombatWithParty(u) then
+      -- Check if the unit is in combat with the player's pet
+      local pet = Pet and Pet.current
+      if pet and u.inCombatWith(pet) then
+        keep[#keep + 1] = u
+        goto skip_ex
+      end
+      goto skip_ex
+    end
+
     -- Geometry-only LOS: terrain + buildings, no model collision
     do
       local ok, vis = pcall(game.is_visible, Me.obj_ptr, u.obj_ptr, LOS_FLAGS)

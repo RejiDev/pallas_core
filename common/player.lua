@@ -29,7 +29,7 @@ end
 -- Spell ID 75 is "Auto Shot"
 ---@return boolean - true if the player is auto-ranging, false otherwise
 function Player:IsAutoRanging()
-  return game.is_current_spell(75)
+  return Spell.AutoShot:
 end
 
 -- Stop any ongoing casting
