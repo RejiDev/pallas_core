@@ -110,6 +110,7 @@ function Plugin.onTick()
         game.outline_write(candidates[i].obj_ptr, slot)
     end
 
+    -- e.g. if n=3, slots 4,3,2 are used; clear slots 1 and 0
     local lowest_used = 5 - n
     for slot = lowest_used - 1, 0, -1 do
         game.outline_clear(slot)
@@ -117,12 +118,10 @@ function Plugin.onTick()
 end
 
 function Plugin.onDraw()
+    if not next(cfg) then return end
+
     local vis, open = imgui.begin_window("Chams", 0)
-    if not vis then
-        imgui.end_window()
-        return
-    end
-    if not open then
+    if not vis or not open then
         imgui.end_window()
         return
     end
