@@ -272,6 +272,106 @@ function Unit:HasBuffByMe(name_or_id)
   return self:GetAuraByMe(name_or_id) ~= nil
 end
 
+-- ── Dispel helpers ──────────────────────────────────────────────────
+-- dispel_type values: 1=Magic, 2=Curse, 3=Disease, 4=Poison, 9=Enrage
+
+--- Returns true if the unit has any dispellable debuff of the given type(s).
+--- @param types number|table  Single dispel_type int or array of ints
+function Unit:HasDispellableDebuff(types)
+  if type(types) == "number" then types = { types } end
+  local set = {}
+  for _, t in ipairs(types) do set[t] = true end
+
+  local auras = self.Auras
+  if auras then
+    for i = 1, #auras do
+      local a = auras[i]
+      if a.dispel_type and set[a.dispel_type] then
+        local flags = a.flags or 0
+        local harmful = math.floor(flags / 16) % 2 == 1
+        if harmful then return true end
+      end
+    end
+  end
+  return false
+end
+
+--- Returns the first dispellable debuff matching the given type(s), or nil.
+--- @param types number|table  Single dispel_type int or array of ints
+--- @return table|nil  aura entry with spell_id, dispel_type, remaining, etc.
+function Unit:GetDispellableDebuff(types)
+  if type(types) == "number" then types = { types } end
+  local set = {}
+  for _, t in ipairs(types) do set[t] = true end
+
+  local auras = self.Auras
+  if auras then
+    for i = 1, #auras do
+      local a = auras[i]
+      if a.dispel_type and set[a.dispel_type] then
+        local flags = a.flags or 0
+        local harmful = math.floor(flags / 16) % 2 == 1
+        if harmful then return a end
+      end
+    end
+  end
+  return nil
+end
+
+--- Returns all dispellable debuffs matching the given type(s).
+--- @param types number|table  Single dispel_type int or array of ints
+function Unit:GetDispellableDebuffs(types)
+  if type(types) == "number" then types = { types } end
+  local set = {}
+  for _, t in ipairs(types) do set[t] = true end
+
+  local result = {}
+  local auras = self.Auras
+  if auras then
+    for i = 1, #auras do
+      local a = auras[i]
+      if a.dispel_type and set[a.dispel_type] then
+        local flags = a.flags or 0
+        local harmful = math.floor(flags / 16) % 2 == 1
+        if harmful then result[#result + 1] = a end
+      end
+    end
+  end
+  return result
+end
+
+--- Returns true if the unit has any stealable (Magic) buff.
+function Unit:HasStealableBuff()
+  local auras = self.Auras
+  if auras then
+    for i = 1, #auras do
+      local a = auras[i]
+      if a.dispel_type == 1 then
+        local flags = a.flags or 0
+        local helpful = math.floor(flags / 256) % 2 == 1
+        if helpful then return true end
+      end
+    end
+  end
+  return false
+end
+
+--- Returns the first stealable (Magic) buff, or nil.
+function Unit:GetStealableBuff()
+  local auras = self.Auras
+  if auras then
+    for i = 1, #auras do
+      local a = auras[i]
+      if a.dispel_type == 1 then
+        local flags = a.flags or 0
+        local helpful = math.floor(flags / 256) % 2 == 1
+        if helpful then return a end
+      end
+    end
+  end
+  return nil
+end
+
 function Unit:Role()
   local ok, result = pcall(game.unit_role, self.obj_ptr)
   return ok and result or "NONE"

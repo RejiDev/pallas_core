@@ -363,6 +363,52 @@ function SpellWrapper:CastAtPos(x_or_entity, y, z)
   end
 end
 
+--- Dispel: scan friendly targets for dispellable debuffs and cast on the best one.
+--- @param dispel_types table  Array of dispel type ints this spell can remove
+---                            (1=Magic, 2=Curse, 3=Disease, 4=Poison, 9=Enrage)
+--- @param options table|nil   Optional: {maxRange=30, prioritizeTank=true}
+--- Returns true if a dispel was cast, false otherwise.
+function SpellWrapper:Dispel(dispel_types, options)
+  if not dispel_types or #dispel_types == 0 then return false end
+  options = options or {}
+  local max_range = options.maxRange or 30
+  local prioritize_tank = options.prioritizeTank ~= false
+
+  if not self:IsReady() then return false end
+
+  local candidates = {}
+  local friends = Heal and Heal.PriorityList or {}
+
+  for _, entry in ipairs(friends) do
+    local u = entry.Unit
+    if u and not u.IsDead and u:HasDispellableDebuff(dispel_types) then
+      local d = Me and Me:GetDistance(u) or 999
+      if d <= max_range and self:InRange(u) then
+        local priority = 100 - u.HealthPct
+        if prioritize_tank and u:IsTank() then priority = priority + 50 end
+        candidates[#candidates + 1] = { unit = u, priority = priority }
+      end
+    end
+  end
+
+  -- Also check self (Me) if not already in the list
+  if Me and not Me.IsDead and Me:HasDispellableDebuff(dispel_types) then
+    local dominated = false
+    for _, c in ipairs(candidates) do
+      if c.unit.Guid == Me.Guid then dominated = true; break end
+    end
+    if not dominated then
+      local priority = 100 - Me.HealthPct + 30
+      candidates[#candidates + 1] = { unit = Me, priority = priority }
+    end
+  end
+
+  if #candidates == 0 then return false end
+
+  table.sort(candidates, function(a, b) return a.priority > b.priority end)
+  return self:CastEx(candidates[1].unit)
+end
+
 --- Enhanced interrupt function with advanced targeting and timing options.
 --- Scans Combat.Targets for interruptible targets with proper range/facing checks.
 --- Uses interrupts.lua data for filtering instead of GUI whitelist.
