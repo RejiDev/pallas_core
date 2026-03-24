@@ -271,14 +271,13 @@ function SpellWrapper:CastEx(target, opts)
     end
   end
 
-  --[[
   -- Line of sight check
   if not skiplos and target and target ~= Me and Me and Me.obj_ptr and target.obj_ptr then
     local lok, visible = pcall(game.is_visible, Me.obj_ptr, target.obj_ptr, 0x03)
     if lok and not visible then
       return false
     end
-  end--]]
+  end
 
   local code, desc = self:Cast(target)
 
