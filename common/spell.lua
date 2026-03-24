@@ -207,9 +207,10 @@ end
 ---   Throttled (9)          → pending cast exists, stop ALL casts this tick
 ---   NotReady/OnCD (10,11)  → GCD rolling or system busy, try again next tick
 ---   Other failure          → hard fail, per-spell 1s backoff
-function SpellWrapper:CastEx(target, skipusable, skipfacing)
+function SpellWrapper:CastEx(target, skipusable, skipfacing, skipmoving)
   skipusable = skipusable or false
   skipfacing = skipfacing or false
+  skipmoving = skipmoving or false
   if self.Id == 0 or not self.IsKnown then
     return false
   end
@@ -241,7 +242,7 @@ function SpellWrapper:CastEx(target, skipusable, skipfacing)
   end
 
   -- Moving check: if spell has cast time and player is moving, return false
-  if Me and Me:IsMoving() then
+  if not skipmoving and Me and Me.IsMoving then
     local iok, info = pcall(game.get_spell_info, self.Id)
     if iok and info and info.cast_time and info.cast_time > 0 then
       return false
@@ -502,21 +503,13 @@ function SpellWrapper:Interrupt(options)
     -- Advanced timing logic (optional enhancement)
     local should_interrupt = true
     if cast_info and PallasSettings.PallasInterruptTiming then
-      local now = os.clock() * 1000 -- Convert to milliseconds
-      
-      if cast_info.cast_start and cast_info.cast_end then
-        -- For regular casts: check cast percentage
-        local cast_duration = cast_info.cast_end - cast_info.cast_start
-        local cast_remaining = cast_info.cast_end - now
-        local cast_pct_remaining = (cast_remaining / cast_duration) * 100
-        
-        local interrupt_pct = PallasSettings.PallasInterruptPercentage or 80
-        should_interrupt = cast_pct_remaining <= interrupt_pct
-      elseif cast_info.channel_start then
-        -- For channeled spells: use random delay (700ms ± 400ms)
-        local channel_time = now - cast_info.channel_start
-        local random_delay = 700 + (math.random() * 800 - 400) -- 300-1100ms range
-        should_interrupt = channel_time > random_delay
+      if cast_info.start_time and cast_info.end_time and cast_info.remaining then
+        local cast_duration = cast_info.end_time - cast_info.start_time
+        if cast_duration > 0 then
+          local cast_pct_remaining = (cast_info.remaining / cast_duration) * 100
+          local interrupt_pct = PallasSettings.PallasInterruptPercentage or 80
+          should_interrupt = cast_pct_remaining <= interrupt_pct
+        end
       end
     end
 

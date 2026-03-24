@@ -6,6 +6,9 @@ local options = {
 	},
 }
 
+local THUNDERSTORM_RANGE = 10
+local THUNDERSTORM_COUNT = 3
+
 local function DoCombat()
 	if Me:IsCastingOrChanneling() then
 		return
@@ -28,11 +31,17 @@ local function DoCombat()
 		return
 	end
 
-	if target.InCombat and Spell.EarthShock:CastEx(target) then
+	-- Thunderstorm: knock back melee enemies when too many are close
+	local nearby = Combat:GetTargetsAround(Me, THUNDERSTORM_RANGE)
+	if nearby >= THUNDERSTORM_COUNT and Spell.Thunderstorm:CastEx(Me) then
 		return
 	end
 
-	if Spell.LightningBolt:CastEx(target) then
+	if Spell.EarthShock:CastEx(target) then
+		return
+	end
+
+	if Spell.LightningBolt:CastEx(target, false, false, true) then
 		return
 	end
 end
