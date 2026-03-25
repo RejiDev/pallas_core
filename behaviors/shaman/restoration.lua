@@ -24,17 +24,13 @@ local function DoCombat()
         return
     end
 
-    if lowest.HealthPct < 50 or Me.PowerPct < 60 then return end
+    if lowest.HealthPct < 80 or Me.PowerPct < 60 then return end
 
     if not Me:HasAura("Flametongue Weapon (Passive)") and Spell.FlametongueWeapon:CastEx(Me) then
         return
     end
 
     if not Me:HasAura("Lightning Shield") and Spell.LightningShield:CastEx(Me) then
-        return
-    end
-
-    if Me.HealthPct < 50 and Spell.HealingSurge:CastEx(Me) then
         return
     end
 
@@ -80,9 +76,11 @@ local function DoHeal()
         return
     end
 
+    --[[
     if lowest.HealthPct < 80 and Spell.HealingWave:CastEx(lowest) then
         return
     end
+    --]]
 
     if Spell.PurifySpirit:Dispel(true, { DispelType.Magic, DispelType.Curse }) then
         return
