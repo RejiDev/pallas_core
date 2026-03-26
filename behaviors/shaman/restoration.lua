@@ -2,7 +2,21 @@ local options = {
     Name = "Shaman (Restoration)", -- shown as collapsing header
 
     Widgets = {
-        { type = "text", text = "=== General ===" },
+        { type = "header", text = "General" },
+        { type = "slider", uid = "RestoShamanDPSAboveHP", text = "DPS Above Health %", default = 80, min = 0, max = 100 },
+
+        { type = "header", text = "Single Target Healing" },
+        { type = "slider", uid = "RestoShamanHealingSurge", text = "Healing Surge %", default = 65, min = 0, max = 100 },
+        { type = "slider", uid = "RestoShamanHealingWave", text = "Healing Wave %", default = 80, min = 0, max = 100 },
+        { type = "slider", uid = "RestoShamanRiptide", text = "Riptide %", default = 90, min = 0, max = 100 },
+
+        { type = "header", text = "AoE Healing" },
+
+        { type = "header", text = "Utility" },
+        { type = "combobox", uid = "RestoShamanEarthShieldTarget", text = "Earth Shield", default = 0, options = { "Tank 1", "Tank 2", "Off" } },
+        { type = "checkbox", uid = "RestoShamanPurifySpirit", text = "Purify Spirit", default = true },
+        { type = "combobox", uid = "RestoShamanWeaponImbue", text = "Weapon Imbue", default = 0, options = { "Flametongue", "Earthliving" } },
+        { type = "combobox", uid = "RestoShamanShieldBuff", text = "Shield Buff", default = 0, options = { "Water Shield", "Lightning Shield" } },
     },
 }
 
@@ -10,7 +24,8 @@ local function DoRotation()
     local lowest = Heal:GetLowestMember()
 
     -- Cancel Healing Surge if nobody needs healing
-    if Me.CastingSpellId == Spell.HealingSurge.Id and (not lowest or lowest.HealthPct > 90) then
+    local surge_pct = PallasSettings.RestoShamanHealingSurge or 65
+    if Me.CastingSpellId == Spell.HealingSurge.Id and (not lowest or lowest.HealthPct > surge_pct) then
         Me:StopCasting()
     end
 
@@ -26,38 +41,67 @@ local function DoRotation()
         return
     end
 
-    -- Healing
+    -- Single Target Healing
     if lowest then
-        if lowest.HealthPct < 65 and Spell.HealingSurge:CastEx(lowest) then
+        local wave_pct = PallasSettings.RestoShamanHealingWave or 80
+        local riptide_pct = PallasSettings.RestoShamanRiptide or 90
+
+        if lowest.HealthPct < surge_pct and Spell.HealingSurge:CastEx(lowest) then
             return
         end
 
-        if lowest.HealthPct < 90 and Spell.Riptide:CastEx(lowest) then
+        if lowest.HealthPct < wave_pct and Spell.HealingWave:CastEx(lowest) then
+            return
+        end
+
+        if lowest.HealthPct < riptide_pct and Spell.Riptide:CastEx(lowest) then
             return
         end
     end
 
     -- Utility
-    local tank = Heal.Friends.Tanks[1]
-    if tank and not tank:HasAura("Earth Shield") and Spell.EarthShield:CastEx(tank) then
-        return
+    local es_choice = PallasSettings.RestoShamanEarthShieldTarget or 0
+    if es_choice ~= 2 then -- not "Off"
+        local tank = Heal.Friends.Tanks[es_choice + 1] -- 0=Tank1, 1=Tank2
+        if tank and not tank:HasAura("Earth Shield") and Spell.EarthShield:CastEx(tank) then
+            return
+        end
     end
 
-    if Spell.PurifySpirit:Dispel(true, { DispelType.Magic, DispelType.Curse }) then
-        return
+    if PallasSettings.RestoShamanPurifySpirit ~= false then
+        if Spell.PurifySpirit:Dispel(true, { DispelType.Magic, DispelType.Curse }) then
+            return
+        end
     end
 
     -- Damage (only when healing is comfortable)
-    if lowest and (lowest.HealthPct < 80 or Me.PowerPct < 60) then
+    local dps_above_hp = PallasSettings.RestoShamanDPSAboveHP or 80
+    if lowest and (lowest.HealthPct < dps_above_hp or Me.PowerPct < 60) then
         return
     end
 
-    if not Me:HasAura("Flametongue Weapon (Passive)") and Spell.FlametongueWeapon:CastEx(Me) then
-        return
+    -- Weapon imbue
+    local imbue_choice = PallasSettings.RestoShamanWeaponImbue or 0
+    if imbue_choice == 0 then
+        if not Me:HasAura("Flametongue Weapon (Passive)") and Spell.FlametongueWeapon:CastEx(Me) then
+            return
+        end
+    else
+        if not Me:HasAura("Earthliving Weapon (Passive)") and Spell.EarthlivingWeapon:CastEx(Me) then
+            return
+        end
     end
 
-    if not Me:HasAura("Water Shield") and Spell.WaterShield:CastEx(Me) then
-        return
+    -- Shield buff
+    local shield_choice = PallasSettings.RestoShamanShieldBuff or 0
+    if shield_choice == 0 then
+        if not Me:HasAura("Water Shield") and Spell.WaterShield:CastEx(Me) then
+            return
+        end
+    else
+        if not Me:HasAura("Lightning Shield") and Spell.LightningShield:CastEx(Me) then
+            return
+        end
     end
 
     local target = Combat.BestTarget
@@ -66,6 +110,10 @@ local function DoRotation()
     end
 
     if Spell.EarthShock:CastEx(target) then
+        return
+    end
+
+    if Combat:GetTargetsAround(target, 12) >= 2 and Spell.ChainLightning:CastEx(target) then
         return
     end
 

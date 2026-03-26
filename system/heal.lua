@@ -122,13 +122,7 @@ function Heal:WeighFilter()
       priority = priority + 5; is_dps = true
     end
 
-    priority = priority + (100 - u.HealthPct)
-    priority = priority - ((100 - Me.PowerPct) * (mana_multi / 100))
-
-    if priority > 0 or u.InCombat or is_me then
-      self.PriorityList[#self.PriorityList + 1] = { Unit = u, Priority = priority }
-    end
-
+    -- Always populate Friends lists for every group member
     if is_tank then
       self.Friends.Tanks[#self.Friends.Tanks + 1] = u
     elseif is_dps then
@@ -137,6 +131,13 @@ function Heal:WeighFilter()
       self.Friends.Healers[#self.Friends.Healers + 1] = u
     end
     self.Friends.All[#self.Friends.All + 1] = u
+
+    priority = priority + (100 - u.HealthPct)
+    priority = priority - ((100 - Me.PowerPct) * (mana_multi / 100))
+
+    if priority > 0 or u.InCombat or is_me then
+      self.PriorityList[#self.PriorityList + 1] = { Unit = u, Priority = priority }
+    end
 
     ::continue::
   end
