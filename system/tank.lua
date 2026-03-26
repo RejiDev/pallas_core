@@ -10,6 +10,12 @@ Tank.BestTarget   = nil
 
 function Tank:Update()
   Targeting.Update(self)
+
+  if PallasSettings.PallasAutoTarget and Me and not Me.Target then
+    if self.BestTarget and self.BestTarget:validTarget() then
+      Me:SetTarget(self.BestTarget)
+    end
+  end
 end
 
 function Tank:Reset()
