@@ -45,7 +45,7 @@ local function DoRotation()
 
     -- Single Target Healing
     if lowest then
-        if lowest.HealthPct < surge_pct and Spell.HealingSurge:CastEx(lowest) then
+        if lowest.HealthPct < surge_pct and Spell.HealingSurge:CastEx(lowest, { skipFacing = true }) then
             return
         end
     end
@@ -54,7 +54,7 @@ local function DoRotation()
     local hst_count = PallasSettings.RestoShamanHSTCount or 3
     local hst_health = PallasSettings.RestoShamanHSTHealth or 80
     local _, members_below = Heal:GetMembersBelow(hst_health)
-    if members_below >= hst_count and Spell.HealingStreamTotem:CastEx(Me) then
+    if members_below >= hst_count and Spell.HealingStreamTotem:CastEx(Me, { skipFacing = true }) then
         return
     end
 
@@ -63,11 +63,11 @@ local function DoRotation()
         local wave_pct = PallasSettings.RestoShamanHealingWave or 80
         local riptide_pct = PallasSettings.RestoShamanRiptide or 90
 
-        if lowest.HealthPct < wave_pct and Spell.HealingWave:CastEx(lowest) then
+        if lowest.HealthPct < wave_pct and Spell.HealingWave:CastEx(lowest, { skipFacing = true }) then
             return
         end
 
-        if lowest.HealthPct < riptide_pct and Spell.Riptide:CastEx(lowest) then
+        if lowest.HealthPct < riptide_pct and Spell.Riptide:CastEx(lowest, { skipFacing = true }) then
             return
         end
     end
@@ -126,6 +126,17 @@ local function DoRotation()
     local target = Combat.BestTarget
     if not target then
         return
+    end
+
+    -- Lava Burst: highest damage priority, cast on any target with our Flame Shock
+    if target:GetAuraByMe("Flame Shock") and Spell.LavaBurst:CastEx(target) then
+        return
+    end
+
+    for _, u in ipairs(Combat.Targets or {}) do
+        if u:GetAuraByMe("Flame Shock") and Spell.LavaBurst:CastEx(u) then
+            return
+        end
     end
 
     if Combat:GetTargetsAround(target, 12) >= 2 and Spell.ChainLightning:CastEx(target) then

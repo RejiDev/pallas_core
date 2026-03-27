@@ -441,7 +441,7 @@ function SpellWrapper:_DispelFriendly(dispel_types, max_range, options)
   if #candidates == 0 then return false end
 
   table.sort(candidates, function(a, b) return a.priority > b.priority end)
-  return self:CastEx(candidates[1].unit)
+  return self:CastEx(candidates[1].unit, { skipFacing = true })
 end
 
 function SpellWrapper:_DispelOffensive(dispel_types, max_range, options)
@@ -471,7 +471,7 @@ function SpellWrapper:_DispelOffensive(dispel_types, max_range, options)
   end
 
   if best_target then
-    return self:CastEx(best_target)
+    return self:CastEx(best_target, { skipFacing = true })
   end
 
   return false

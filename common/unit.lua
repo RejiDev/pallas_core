@@ -250,24 +250,21 @@ function Unit:GetAura(name_or_id)
 end
 
 --- Returns the aura only if it was cast by the local player.
---- Checks caster_name from the snapshot first, then falls back to
---- game.aura_info's is_from_player flag.
+--- Scans all aura slots via game.scan_aura_entry and matches caster guid
+--- against the local player's guid to ensure ownership.
 function Unit:GetAuraByMe(name_or_id)
-  local auras = self.Auras
-  if auras and Me then
-    for i = 1, #auras do
-      local a = auras[i]
-      if aura_matches(a, name_or_id) then
-        if a.caster_name and a.caster_name == Me.Name then return a end
-        if a.caster_lo and Me.guid_lo and a.caster_lo == Me.guid_lo
-            and a.caster_hi == Me.guid_hi then
-          return a
-        end
-      end
+  if not Me then return nil end
+  local ptr = self.obj_ptr
+  local my_lo = Me.guid_lo
+  local my_hi = Me.guid_hi
+  local count = #(self.Auras or {})
+  for i = 0, count - 1 do
+    local ok, a = pcall(game.scan_aura_entry, ptr, i)
+    if not ok or not a then break end
+    if aura_matches(a, name_or_id) and a.caster_lo == my_lo and a.caster_hi == my_hi then
+      return a
     end
   end
-  local ok, result = pcall(game.aura_info, self.obj_ptr, name_or_id)
-  if ok and result and result.is_from_player then return result end
   return nil
 end
 
