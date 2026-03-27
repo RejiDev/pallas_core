@@ -300,7 +300,6 @@ end
 
 local COL_TARGET  = imgui.color_u32(1.0, 1.0, 0.0, 1.0)   -- yellow
 local COL_ENEMY   = imgui.color_u32(1.0, 0.2, 0.2, 1.0)   -- red
-local COL_GREEN   = imgui.color_u32(0.3, 1.0, 0.3, 1.0)   -- green
 local COL_GREY    = imgui.color_u32(0.7, 0.7, 0.7, 0.9)   -- grey
 local COL_WHITE   = imgui.color_u32(1.0, 1.0, 1.0, 1.0)   -- white
 
@@ -358,51 +357,6 @@ local function draw_esp()
     end
   end
 
-  -- ── HUD: cast diagnostics (top-left area) ──────────────────────
-  local hud_x, hud_y = 20, 60
-
-  -- Last successful cast
-  local last = Pallas._last_cast
-  if last and last ~= "" then
-    local age = os.clock() - (Pallas._last_cast_time or 0)
-    if age < 3 then
-      imgui.draw_text(hud_x, hud_y, COL_GREEN,
-        string.format("OK: %s -> %s [code=%d %s]",
-          last, Pallas._last_cast_tgt or "",
-          Pallas._last_cast_code or 0,
-          Pallas._last_cast_desc or ""))
-      hud_y = hud_y + 16
-    end
-  end
-
-  -- Last failed cast (with result code + description)
-  local fail = Pallas._last_fail
-  if fail and fail ~= "" then
-    local age = os.clock() - (Pallas._last_fail_time or 0)
-    if age < 5 then
-      imgui.draw_text(hud_x, hud_y, COL_ENEMY,
-        string.format("FAIL: %s [code=%d %s]",
-          fail,
-          Pallas._last_fail_code or -1,
-          Pallas._last_fail_desc or ""))
-      hud_y = hud_y + 16
-    end
-  end
-
-  -- Target info summary
-  if bt then
-    local dist = Me:GetDistance(bt)
-    imgui.draw_text(hud_x, hud_y, COL_GREY,
-      string.format("Best: %s | dist=%.1f | hp=%.0f%% | combat=%s",
-        bt.Name, dist, bt.HealthPct,
-        bt.InCombat and "yes" or "no"))
-    hud_y = hud_y + 16
-
-    imgui.draw_text(hud_x, hud_y, COL_GREY,
-      string.format("Enemies: %d | Casting: %s",
-        Combat.Enemies or 0,
-        Me.IsCasting and "yes" or "no"))
-  end
 end
 
 function Plugin.onDraw()
