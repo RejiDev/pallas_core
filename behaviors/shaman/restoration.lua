@@ -43,6 +43,18 @@ local function DoRotation()
         return
     end
 
+    -- Astral Shift: defensive when more than 1 enemy targeting us
+    local enemies_on_me = 0
+    for _, u in ipairs(Combat.Targets or {}) do
+        local t = u:GetTarget()
+        if t and t.Guid == Me.Guid then
+            enemies_on_me = enemies_on_me + 1
+        end
+    end
+    if enemies_on_me > 1 and not Me:HasAura("Astral Shift") and Spell.AstralShift:CastEx(Me) then
+        return
+    end
+
     -- Single Target Healing
     if lowest then
         if lowest.HealthPct < surge_pct and Spell.HealingSurge:CastEx(lowest, { skipFacing = true }) then
