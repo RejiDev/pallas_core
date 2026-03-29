@@ -129,6 +129,7 @@ function Combat:InclusionFilter()
   end
 
   if not tgt:validTarget() then return end
+  if tgt:IsImmune() then return end
   self.Targets[#self.Targets + 1] = tgt
 end
 

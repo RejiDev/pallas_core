@@ -528,6 +528,7 @@ end
 -- 0x04008000 (bits 15 + 26 = UNK_15 + SKINNABLE), matching expected state.
 local UFLAG_IMMUNE_TO_PC  = 0x00000100  -- bit 8
 local UFLAG_IMMUNE_TO_NPC = 0x00000200  -- bit 9
+local UFLAG_IMMUNE        = 0x80000000  -- bit 31
 
 local IMMUNE_AURAS = {
   [642]   = true,  -- Divine Shield
@@ -539,7 +540,7 @@ local IMMUNE_AURAS = {
 
 function Unit:IsImmune()
   local flags = self.UnitFlags or 0
-  if bit.band(flags, UFLAG_IMMUNE_TO_PC + UFLAG_IMMUNE_TO_NPC) ~= 0 then
+  if bit.band(flags, UFLAG_IMMUNE_TO_PC + UFLAG_IMMUNE_TO_NPC + UFLAG_IMMUNE) ~= 0 then
     return true
   end
 

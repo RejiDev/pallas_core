@@ -3,53 +3,55 @@ local options = {
 
     Widgets = {
         { type = "header",   text = "General" },
-        { type = "slider",   uid = "DiscDPSAboveHP",             text = "DPS Above Health %",              default = 90,  min = 0,   max = 100 },
+        { type = "slider",   uid = "DiscDPSAboveHP",        text = "DPS Above Health %",           default = 90,  min = 0,                                                max = 100 },
 
         { type = "header",   text = "Single Target Healing" },
-        { type = "slider",   uid = "DiscPenanceHP",              text = "Penance %",                       default = 60,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscFlashHealHP",            text = "Flash Heal %",                    default = 50,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscGreaterHealHP",          text = "Greater Heal %",                  default = 45,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscHealHP",                 text = "Heal %",                          default = 85,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscBindingHealHP",          text = "Binding Heal %",                  default = 40,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscBindingHealSelfHP",      text = "Binding Heal Self %",             default = 70,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscRenewHP",                text = "Renew (moving only) %",           default = 50,  min = 0,   max = 100 },
+        { type = "slider",   uid = "DiscPenanceHP",         text = "Penance %",                    default = 60,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscFlashHealHP",       text = "Flash Heal %",                 default = 50,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscGreaterHealHP",     text = "Greater Heal %",               default = 45,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscHealHP",            text = "Heal %",                       default = 85,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscBindingHealHP",     text = "Binding Heal %",               default = 40,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscBindingHealSelfHP", text = "Binding Heal Self %",          default = 70,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscRenewHP",           text = "Renew (moving only) %",        default = 50,  min = 0,                                                max = 100 },
 
         { type = "header",   text = "Shielding" },
-        { type = "checkbox", uid = "DiscPWSOnTargeted",          text = "PW:S allies being targeted",      default = true },
-        { type = "checkbox", uid = "DiscPWSTank",                text = "PW:S tanks always",               default = true },
-        { type = "slider",   uid = "DiscPWSHP",                  text = "PW:S Below Health %",             default = 90,  min = 0,   max = 100 },
+        { type = "checkbox", uid = "DiscPWSOnTargeted",     text = "PW:S allies being targeted",   default = true },
+        { type = "checkbox", uid = "DiscPWSTank",           text = "PW:S tanks always",            default = true },
+        { type = "slider",   uid = "DiscPWSHP",             text = "PW:S Below Health %",          default = 90,  min = 0,                                                max = 100 },
 
         { type = "header",   text = "AoE Healing" },
-        { type = "slider",   uid = "DiscPoHCount",               text = "Prayer of Healing - Members",     default = 3,   min = 1,   max = 5 },
-        { type = "slider",   uid = "DiscPoHHP",                  text = "Prayer of Healing - Health %",    default = 75,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscPoMHP",                  text = "Prayer of Mending - Health %",    default = 85,  min = 0,   max = 100 },
+        { type = "slider",   uid = "DiscPoHCount",          text = "Prayer of Healing - Members",  default = 3,   min = 1,                                                max = 5 },
+        { type = "slider",   uid = "DiscPoHHP",             text = "Prayer of Healing - Health %", default = 75,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscPoMHP",             text = "Prayer of Mending - Health %", default = 85,  min = 0,                                                max = 100 },
 
         { type = "header",   text = "Cooldowns" },
-        { type = "slider",   uid = "DiscPainSuppressionHP",      text = "Pain Suppression %",              default = 25,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscDesperatePrayerHP",      text = "Desperate Prayer %",              default = 35,  min = 0,   max = 100 },
-        { type = "slider",   uid = "DiscVoidShiftHP",            text = "Void Shift target %",             default = 20,  min = 0,   max = 100 },
-        { type = "checkbox", uid = "DiscUseSpiritShell",         text = "Use Spirit Shell",                default = true },
-        { type = "checkbox", uid = "DiscUsePowerInfusion",       text = "Use Power Infusion",              default = true },
-        { type = "checkbox", uid = "DiscUseShadowfiend",         text = "Use Shadowfiend/Mindbender",      default = true },
+        { type = "slider",   uid = "DiscPainSuppressionHP", text = "Pain Suppression %",           default = 25,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscDesperatePrayerHP", text = "Desperate Prayer %",           default = 35,  min = 0,                                                max = 100 },
+        { type = "slider",   uid = "DiscVoidShiftHP",       text = "Void Shift target %",          default = 20,  min = 0,                                                max = 100 },
+        { type = "checkbox", uid = "DiscUseSpiritShell",    text = "Use Spirit Shell",             default = true },
+        { type = "checkbox", uid = "DiscUsePowerInfusion",  text = "Use Power Infusion",           default = true },
+        { type = "checkbox", uid = "DiscUseShadowfiend",    text = "Use Shadowfiend/Mindbender",   default = true },
 
         { type = "header",   text = "Utility" },
-        { type = "checkbox", uid = "DiscPurify",                 text = "Purify",                          default = true },
-        { type = "checkbox", uid = "DiscStopCasting",            text = "Cancel overheals",                default = true },
-        { type = "combobox", uid = "DiscInnerBuff",              text = "Inner Buff",                      default = 0,   options = { "Inner Fire", "Inner Will", "Auto (mana)" } },
+        { type = "checkbox", uid = "DiscPurify",            text = "Purify",                       default = true },
+        { type = "checkbox", uid = "DiscStopCasting",       text = "Cancel overheals",             default = true },
+        { type = "checkbox", uid = "DiscPWFort",             text = "Power Word: Fortitude",        default = true },
+        { type = "combobox", uid = "DiscInnerBuff",         text = "Inner Buff",                   default = 0,   options = { "Inner Fire", "Inner Will", "Auto (mana)" } },
     },
 }
 
 local auras = {
-    evangelism            = 81661,
-    spirit_shell          = 109964,
-    power_word_fortitude  = 21562,
-    from_darkness         = 114255, -- From Darkness, Comes Light (free Flash Heal)
-    weakened_soul         = 6788,
-    prayer_of_mending     = 41635,
-    inner_fire            = 588,
-    inner_will            = 73413,
-    inner_focus           = 89485,
-    angelic_feather       = 121557,
+    evangelism           = 81661,
+    spirit_shell         = 109964,
+    spirit_shell_absorb  = 114908,  -- Spirit Shell (absorb)
+    power_word_fortitude = 21562,
+    from_darkness        = 114255,  -- From Darkness, Comes Light (free Flash Heal)
+    weakened_soul        = 6788,
+    prayer_of_mending    = 41635,
+    inner_fire           = 588,
+    inner_will           = 73413,
+    inner_focus          = 89485,
+    angelic_feather      = 121557,
 }
 
 local SPIRIT_SHELL_KEY = 550 -- ImGuiKey E
@@ -171,7 +173,7 @@ local function DoRotation()
                 -- Target members who don't already have Spirit Shell absorb
                 local all_friends = Heal.Friends and Heal.Friends.All or {}
                 for _, f in ipairs(all_friends) do
-                    if not f:HasAura(auras.spirit_shell) then
+                    if not f:HasAura(auras.spirit_shell_absorb) then
                         if Spell.PrayerOfHealing:CastEx(f, { skipFacing = true }) then
                             return
                         end
@@ -323,7 +325,7 @@ local function DoRotation()
     end
 
     -- ── Buffs (out of combat) ────────────────────────────────────────
-    if not Me.InCombat then
+    if not Me.InCombat and PallasSettings.DiscPWFort ~= false then
         for _, f in ipairs(Heal.Friends and Heal.Friends.All or {}) do
             if not f:HasAura(auras.power_word_fortitude) and Spell.PowerWordFortitude:CastEx(f) then
                 return
@@ -401,7 +403,7 @@ local function DoRotation()
     end
 
     -- Shadow Word: Death execute (< 20% HP)
-    if target.HealthPct <= 20 and Me.PowerPct > 70 and Spell.ShadowWordDeath:CastEx(target) then
+    if target.HealthPct <= 20 and Spell.ShadowWordDeath:CastEx(target) then
         return
     end
 
