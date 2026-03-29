@@ -52,6 +52,7 @@ local auras = {
     inner_will           = 73413,
     inner_focus          = 89485,
     angelic_feather      = 121557,
+    altered_form         = 97709,
 }
 
 local SPIRIT_SHELL_KEY = 550 -- ImGuiKey E
@@ -78,6 +79,7 @@ local function DoRotation()
     spirit_shell_key_down = key_now
 
     if Me.IsMounted then return end
+    if Me:IsDisabled() then return end
 
     local lowest = Heal:GetLowestMember()
 
@@ -321,6 +323,11 @@ local function DoRotation()
     -- Resurrect current target if dead
     local myTarget = Me.Target
     if myTarget and myTarget.IsDead and myTarget.isPlayer and Spell.Resurrection:CastEx(myTarget) then
+        return
+    end
+
+    -- ── Two Forms: revert Altered Form ────────────────────────────────
+    if Me:HasAura(auras.altered_form) and Spell.TwoForms:CastEx(Me) then
         return
     end
 

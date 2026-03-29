@@ -689,6 +689,11 @@ function Unit:IsIncapacitated()
   return bit.band(self.UnitFlags, bit.bor(FLAG_STUNNED, FLAG_CONFUSED, FLAG_FLEEING)) ~= 0
 end
 
+--- Returns true if the unit has any disabling CC (stun/silence/fear/confuse/pacify), excluding disarm and root.
+function Unit:IsDisabled()
+  return bit.band(self.UnitFlags, bit.bor(FLAG_STUNNED, FLAG_SILENCED, FLAG_PACIFIED, FLAG_CONFUSED, FLAG_FLEEING)) ~= 0
+end
+
 -- ── Speed / Slow / Root ──
 -- Uses game.unit_speed() for dynamic per-unit speed (reflects buffs, slows, mounts).
 
