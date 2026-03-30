@@ -244,9 +244,6 @@ local function draw_tab_dispels()
   else
     imgui.text_colored(0.5, 0.5, 0.5, 1.0, "Dispelling disabled globally")
   end
-
-  imgui.spacing()
-  imgui.text_colored(0.5, 0.5, 0.5, 1.0, "Per-spec dispel toggles are in behavior tabs")
 end
 
 function Menu:Draw()
